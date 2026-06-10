@@ -1,9 +1,757 @@
 <!DOCTYPE html>
-<html>
+<html lang="vi">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Lesson 8 - Animals</title>
+<title>Lesson 8 — Animals & Pets</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --green:#16a34a;--green-l:#dcfce7;
+  --emerald:#059669;--emerald-l:#d1fae5;
+  --amber:#d97706;--amber-l:#fef3c7;
+  --sky:#0284c7;--sky-l:#e0f2fe;
+  --rose:#e11d48;--rose-l:#ffe4e6;
+  --violet:#7c3aed;--violet-l:#ede9fe;
+  --teal:#0d9488;--teal-l:#ccfbf1;
+  --orange:#ea580c;--orange-l:#ffedd5;
+  --red:#dc2626;--red-l:#fee2e2;
+  --ink:#1c1917;--muted:#78716c;
+  --border:#e7e5e4;--bg:#f0fdf4;--card:#fff;
+  --radius:16px;--shadow:0 4px 24px rgba(0,0,0,.08);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--ink);line-height:1.65}
+
+.hero{background:linear-gradient(135deg,#064e3b 0%,#065f46 40%,#047857 70%,#059669 100%);color:#fff;padding:52px 24px 40px;text-align:center;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Ccircle cx='30' cy='30' r='20'/%3E%3C/g%3E%3C/svg%3E")}
+.hero-badge{display:inline-block;background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);padding:4px 18px;border-radius:100px;font-size:12px;font-weight:700;letter-spacing:2px;text-transform:uppercase;margin-bottom:14px}
+.hero h1{font-size:clamp(30px,6vw,54px);font-weight:900;margin-bottom:10px;text-shadow:0 2px 16px rgba(0,0,0,.2)}
+.hero p{font-size:15px;opacity:.8;margin-bottom:20px}
+.hero-pills{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.hero-pills span{background:rgba(255,255,255,.12);border-radius:100px;padding:5px 16px;font-size:13px;font-weight:700}
+.objectives{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);border-radius:12px;padding:14px 22px;margin-top:20px;max-width:460px;margin-left:auto;margin-right:auto;text-align:left;font-size:13px;line-height:2}
+
+.nav{background:#fff;border-bottom:2px solid var(--border);position:sticky;top:0;z-index:100;display:flex;overflow-x:auto;scrollbar-width:none;padding:0 16px}
+.nav::-webkit-scrollbar{display:none}
+.nav-btn{padding:13px 16px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;background:none;border:none;border-bottom:3px solid transparent;color:var(--muted);cursor:pointer;white-space:nowrap;transition:all .2s}
+.nav-btn:hover{color:var(--green)}
+.nav-btn.active{color:var(--green);border-bottom-color:var(--green)}
+
+.section{display:none;padding:30px 20px;max-width:980px;margin:0 auto}
+.section.active{display:block}
+.sec-title{font-size:22px;font-weight:900;margin-bottom:6px;display:flex;align-items:center;gap:10px}
+.sec-sub{color:var(--muted);font-size:14px;margin-bottom:22px}
+
+.card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px;margin-bottom:18px;border:1px solid var(--border)}
+
+/* WARMUP: ANIMAL SOUND QUIZ */
+.sound-game{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:14px;margin-bottom:20px}
+.sound-card{border-radius:14px;border:2.5px solid var(--border);background:#fff;cursor:pointer;transition:all .25s;text-align:center;padding:18px 12px;position:relative;overflow:hidden}
+.sound-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.1)}
+.sound-card.correct{border-color:var(--green);background:var(--green-l);animation:pop .3s ease}
+.sound-card.wrong{border-color:var(--red);background:var(--red-l);animation:shake .3s}
+.sound-card.selected{border-color:var(--amber);background:var(--amber-l)}
+.sound-card .s-emoji{font-size:42px;margin-bottom:8px;display:block}
+.sound-card .s-name{font-size:13px;font-weight:800;color:var(--ink)}
+.sound-card .s-sound{font-size:11px;color:var(--muted);margin-top:3px;font-style:italic}
+.sound-card .s-tick{position:absolute;top:7px;right:9px;font-size:16px;opacity:0;transition:opacity .3s}
+.sound-card.correct .s-tick{opacity:1}
+
+.sound-question{background:linear-gradient(135deg,#064e3b,#059669);color:#fff;border-radius:14px;padding:20px 24px;margin-bottom:18px;text-align:center}
+.sound-question .q-label{font-size:12px;font-weight:700;opacity:.7;margin-bottom:6px;text-transform:uppercase;letter-spacing:1px}
+.sound-question .q-text{font-size:18px;font-weight:900}
+.sound-question .q-hint{font-size:13px;opacity:.75;margin-top:6px;font-style:italic}
+
+@keyframes pop{0%{transform:scale(.95)}50%{transform:scale(1.05)}100%{transform:scale(1)}}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+
+/* PART TABS */
+.part-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
+.part-tab{padding:8px 18px;border-radius:100px;border:2px solid var(--border);font-family:'Nunito',sans-serif;font-size:13px;font-weight:700;cursor:pointer;background:#fff;color:var(--muted);transition:all .2s}
+.part-tab.active{background:var(--green);border-color:var(--green);color:#fff}
+.part-panel{display:none}
+.part-panel.active{display:block}
+
+/* ACT TABS */
+.act-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px}
+.act-tab{padding:7px 15px;border-radius:100px;border:2px solid var(--border);font-family:'Nunito',sans-serif;font-size:12px;font-weight:700;cursor:pointer;background:#fff;color:var(--muted);transition:all .2s}
+.act-tab.active{background:var(--green);border-color:var(--green);color:#fff}
+.act-panel{display:none}
+.act-panel.active{display:block}
+
+/* VFC */
+.vfc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(158px,1fr));gap:12px;margin-bottom:16px}
+.vfc{height:170px;perspective:800px;cursor:pointer}
+.vfc-inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .5s}
+.vfc.flipped .vfc-inner{transform:rotateY(180deg)}
+.vfc-front,.vfc-back{position:absolute;inset:0;border-radius:12px;backface-visibility:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px;text-align:center}
+.vfc-front{background:linear-gradient(135deg,#dcfce7,#d1fae5);border:2px solid #bbf7d0}
+.vfc-front .ve{font-size:32px;margin-bottom:7px}
+.vfc-front .vw{font-size:13px;font-weight:800;color:var(--green)}
+.vfc-front .vp{font-size:10px;color:var(--emerald);margin-top:3px}
+.vfc-back{background:linear-gradient(135deg,#064e3b,#059669);color:#fff;transform:rotateY(180deg)}
+.vfc-back .vm{font-size:12px;font-weight:800;margin-bottom:5px}
+.vfc-back .vex{font-size:10px;opacity:.85;line-height:1.5}
+
+/* TABLE */
+.vtable{width:100%;border-collapse:collapse;font-size:13px}
+.vtable th{background:var(--green);color:#fff;padding:11px 13px;text-align:left;font-size:12px;font-weight:700}
+.vtable th:first-child{border-radius:10px 0 0 0}
+.vtable th:last-child{border-radius:0 10px 0 0}
+.vtable td{padding:9px 13px;border-bottom:1px solid var(--border);vertical-align:top}
+.vtable tr:nth-child(even) td{background:#f0fdf4}
+.vtable tr:hover td{background:var(--green-l)}
+.wrd{font-weight:800;color:var(--green)}
+.pron{color:var(--violet);font-size:11px}
+.tbadge{display:inline-block;padding:2px 9px;border-radius:100px;font-size:10px;font-weight:700;text-transform:uppercase}
+.t-noun{background:var(--sky-l);color:var(--sky)}
+.t-verb{background:var(--green-l);color:var(--green)}
+.t-phrase{background:var(--amber-l);color:var(--amber)}
+.t-adj{background:var(--violet-l);color:var(--violet)}
+
+/* GRAMMAR BOXES */
+.g-box{border-radius:14px;padding:16px 20px;margin-bottom:14px}
+.g-green{background:linear-gradient(135deg,var(--green-l),var(--emerald-l));border-left:5px solid var(--green)}
+.g-amber{background:linear-gradient(135deg,var(--amber-l),#fef9c3);border-left:5px solid var(--amber)}
+.g-box h3{font-size:15px;font-weight:800;margin-bottom:9px;color:var(--green)}
+.g-amber h3{color:var(--amber)}
+.g-rule{font-size:14px;padding:7px 0;border-bottom:1px solid rgba(22,163,74,.15)}
+.g-rule:last-child{border-bottom:none}
+.g-hl{color:var(--violet);font-weight:800}
+
+/* FILL */
+.fill-s{font-size:14px;line-height:2.6;padding:14px 18px;background:#f0fdf4;border-radius:10px;border-left:4px solid var(--green);margin-bottom:10px}
+.blank{display:inline-block;border:none;border-bottom:2px solid var(--green);background:transparent;font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;color:var(--green);width:130px;padding:2px 4px;outline:none;text-align:center}
+.blank.ok{border-bottom-color:var(--green);color:var(--green);background:var(--green-l);border-radius:4px}
+.blank.bad{border-bottom-color:var(--red);color:var(--red)}
+
+/* SORT */
+.word-bank{display:flex;flex-wrap:wrap;gap:7px;padding:12px;background:#f0fdf4;border-radius:10px;min-height:48px;margin-bottom:10px}
+.wchip{padding:5px 12px;background:#fff;border:2px solid var(--border);border-radius:100px;font-size:13px;font-weight:700;cursor:pointer;user-select:none;transition:all .2s}
+.wchip:hover{border-color:var(--green);background:var(--green-l)}
+.wchip.used{opacity:.3;pointer-events:none}
+.sort-tgt{min-height:44px;border:2px dashed var(--border);border-radius:10px;padding:8px 12px;display:flex;flex-wrap:wrap;gap:6px;align-items:center;background:#fff}
+.placed{padding:4px 12px;background:var(--green-l);color:var(--green);border-radius:100px;font-size:12px;font-weight:700;cursor:pointer}
+
+/* MATCH */
+.match-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:550px){.match-grid{grid-template-columns:1fr}}
+.match-col h4{font-size:12px;font-weight:700;color:var(--muted);margin-bottom:7px;text-transform:uppercase;letter-spacing:.5px}
+.match-item{padding:9px 13px;border-radius:9px;border:2px solid var(--border);cursor:pointer;font-size:13px;font-weight:600;background:#fff;margin-bottom:7px;transition:all .2s;user-select:none}
+.match-item:hover{border-color:var(--green);background:var(--green-l)}
+.match-item.selected{border-color:var(--amber);background:var(--amber-l)}
+.match-item.correct{border-color:var(--green);background:var(--green-l);color:var(--green);pointer-events:none}
+.match-item.wrong{border-color:var(--red);background:var(--red-l);animation:shake .3s}
+
+/* SELECT */
+.isel{border:2px solid var(--green);border-radius:8px;padding:3px 8px;font-family:'Nunito',sans-serif;font-weight:700;font-size:14px;outline:none;color:var(--green);background:var(--green-l);cursor:pointer}
+.isel.ok{border-color:var(--green);background:var(--green-l);color:var(--green)}
+.isel.bad{border-color:var(--red);background:var(--red-l);color:var(--red)}
+
+/* QUIZ */
+.quiz-item{margin-bottom:16px}
+.quiz-q{font-size:14px;font-weight:700;margin-bottom:8px}
+.quiz-opts{display:flex;flex-direction:column;gap:6px}
+.quiz-opt{padding:9px 13px;border:2px solid var(--border);border-radius:9px;cursor:pointer;font-size:13px;font-weight:600;background:#fff;transition:all .2s}
+.quiz-opt:hover:not(.disabled){border-color:var(--green);background:var(--green-l)}
+.quiz-opt.correct{border-color:var(--green);background:var(--green-l);color:var(--green)}
+.quiz-opt.incorrect{border-color:var(--red);background:var(--red-l);color:var(--red)}
+.quiz-opt.disabled{pointer-events:none}
+
+/* CATEGORY SORT */
+.cat-board{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px}
+@media(max-width:600px){.cat-board{grid-template-columns:1fr}}
+.cat-col{border-radius:12px;border:2px solid var(--border);overflow:hidden}
+.cat-header{padding:10px 14px;font-size:13px;font-weight:800;text-align:center}
+.cat-farm .cat-header{background:var(--amber-l);color:var(--amber)}
+.cat-wild .cat-header{background:var(--green-l);color:var(--green)}
+.cat-insect .cat-header{background:var(--violet-l);color:var(--violet)}
+.cat-body{min-height:100px;padding:8px;display:flex;flex-wrap:wrap;gap:6px;align-items:flex-start;background:#fafafa}
+.cat-chip{padding:4px 11px;border-radius:100px;font-size:12px;font-weight:700;cursor:pointer;user-select:none;transition:all .2s}
+.cat-farm .cat-body .cat-chip{background:var(--amber-l);color:var(--amber);border:1.5px solid #fde68a}
+.cat-wild .cat-body .cat-chip{background:var(--green-l);color:var(--green);border:1.5px solid #bbf7d0}
+.cat-insect .cat-body .cat-chip{background:var(--violet-l);color:var(--violet);border:1.5px solid #c4b5fd}
+.cat-pool{display:flex;flex-wrap:wrap;gap:7px;padding:12px;background:#f0fdf4;border-radius:10px;margin-bottom:12px;min-height:52px}
+.pool-chip{padding:5px 13px;background:#fff;border:2px solid var(--border);border-radius:100px;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s}
+.pool-chip:hover{border-color:var(--green);background:var(--green-l)}
+.pool-chip.placed{opacity:.3;pointer-events:none}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:7px;padding:9px 20px;border-radius:100px;font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;border:none;cursor:pointer;transition:all .2s}
+.btn-green{background:var(--green);color:#fff}
+.btn-green:hover{background:#15803d;transform:translateY(-1px)}
+.btn-ghost{background:#fff;color:var(--ink);border:2px solid var(--border)}
+.btn-ghost:hover{border-color:var(--green);color:var(--green)}
+.score-b{display:inline-flex;align-items:center;gap:6px;background:var(--green-l);color:var(--green);padding:7px 18px;border-radius:100px;font-weight:800;font-size:14px;margin:8px 0}
+.result-msg{padding:11px 15px;border-radius:9px;font-weight:700;font-size:14px;margin-top:10px}
+.result-msg.ok{background:var(--green-l);color:var(--green)}
+.result-msg.bad{background:var(--red-l);color:var(--red)}
+.prog-wrap{background:var(--border);border-radius:100px;height:5px;margin-bottom:18px;overflow:hidden}
+.prog-fill{height:100%;background:linear-gradient(90deg,var(--green),var(--teal));border-radius:100px;transition:width .5s}
+
+/* ANIMAL TABLE */
+.animal-tbl{width:100%;border-collapse:collapse;font-size:13px;margin-bottom:14px}
+.animal-tbl th{background:var(--emerald);color:#fff;padding:10px 13px;font-weight:700;text-align:left}
+.animal-tbl th:first-child{border-radius:8px 0 0 0}
+.animal-tbl th:last-child{border-radius:0 8px 0 0}
+.animal-tbl td{padding:9px 13px;border-bottom:1px solid var(--border)}
+.animal-tbl tr:nth-child(even) td{background:#f0fdf4}
+.animal-tbl tr:hover td{background:var(--green-l)}
+
+/* VIDEO */
+.vid-wrap{position:relative;padding-bottom:56.25%;height:0;overflow:hidden;border-radius:12px;margin-bottom:14px;box-shadow:var(--shadow)}
+.vid-wrap iframe{position:absolute;top:0;left:0;width:100%;height:100%}
+
+/* AUDIO */
+.audio-btn{display:inline-flex;align-items:center;gap:8px;padding:10px 22px;background:linear-gradient(135deg,#064e3b,#059669);color:#fff;border-radius:100px;text-decoration:none;font-weight:800;font-size:14px;transition:opacity .2s}
+.audio-btn:hover{opacity:.85}
+
+/* HOME */
+.hw-box{background:linear-gradient(135deg,#fafaf9,#f0fdf4);border-radius:12px;padding:16px 20px;margin-bottom:16px;border-left:5px solid var(--amber)}
+.hw-box h4{font-size:14px;font-weight:800;color:var(--amber);margin-bottom:10px}
+
+/* DIALOGUE */
+.chat{display:flex;flex-direction:column;gap:10px;margin-bottom:16px}
+.bubble{max-width:78%;padding:11px 15px;border-radius:16px;font-size:14px;line-height:1.6}
+.bub-a{background:var(--sky-l);border-bottom-left-radius:3px;align-self:flex-start}
+.bub-b{background:var(--green-l);border-bottom-right-radius:3px;align-self:flex-end;text-align:right}
+.bub-label{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:2px}
+
+/* ANIMAL HOMES */
+.homes-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-bottom:14px}
+.home-card{border-radius:12px;border:2px solid var(--border);background:#fff;text-align:center;padding:16px 10px;transition:all .2s}
+.home-card:hover{border-color:var(--green);transform:translateY(-2px)}
+.home-card .h-emoji{font-size:36px;margin-bottom:8px;display:block}
+.home-card .h-animal{font-size:13px;font-weight:800;color:var(--green)}
+.home-card .h-home{font-size:12px;color:var(--muted);margin-top:4px}
+
+.search-bar input{width:100%;padding:10px 16px;border:2px solid var(--border);border-radius:10px;font-family:'Nunito',sans-serif;font-size:14px;outline:none;transition:border-color .2s;margin-bottom:14px}
+.search-bar input:focus{border-color:var(--green)}
+
+@media(max-width:600px){.vfc-grid{grid-template-columns:repeat(2,1fr)}.section{padding:18px 12px}.sound-game{grid-template-columns:repeat(2,1fr)}}
+</style>
+</head>
+<body>
+  <!-- HERO -->
+<div class="hero">
+  <div class="hero-badge">📘 Lesson 8 · A1 → A2</div>
+  <h1>🐾 Animals & Pets</h1>
+  <p>Talking about animals, pets, farm animals & wild creatures</p>
+  <div class="hero-pills">
+    <span>⏱ 90 minutes</span><span>🎯 Listening · Speaking</span><span>👤 1–2 students</span>
+  </div>
+  <div class="objectives">
+    <strong>🎯 By the end of this lesson, you can…</strong><br>
+    ✅ Name animals across different groups<br>
+    ✅ Talk about what animals eat, where they live & their babies<br>
+    ✅ Use Present Simple to describe animals
+  </div>
+</div>
+
+<!-- NAV -->
+<nav class="nav">
+  <button class="nav-btn active" onclick="showSection('warmup',this)">🔥 Warm Up</button>
+  <button class="nav-btn" onclick="showSection('keylang',this)">🐄 Key Language</button>
+  <button class="nav-btn" onclick="showSection('vocab',this)">📖 Từ mới</button>
+  <button class="nav-btn" onclick="showSection('listening',this)">🎧 Listening</button>
+  <button class="nav-btn" onclick="showSection('practice',this)">🗣️ Practice</button>
+  <button class="nav-btn" onclick="showSection('activities',this)">🎮 Activities</button>
+  <button class="nav-btn" onclick="showSection('homework',this)">📝 Homework</button>
+</nav>
+
+<!-- ══════════ WARMUP ══════════ -->
+<section id="warmup" class="section active">
+  <div class="sec-title">🔥 Warm Up — Animal Sound Quiz</div>
+  <div class="sec-sub">Nghe mô tả âm thanh của động vật — đoán con nào đang kêu!</div>
+
+  <div class="card">
+    <div style="font-size:15px;font-weight:800;margin-bottom:6px;">🔊 What animal makes this sound?</div>
+    <p style="color:var(--muted);font-size:13px;margin-bottom:18px;">Đọc mô tả âm thanh → nhấn vào con vật bạn nghĩ là đúng. Hoàn thành hết để xem điểm!</p>
+
+    <div class="sound-question" id="sq-box">
+      <div class="q-label">Round <span id="sq-round">1</span> of <span id="sq-total">8</span></div>
+      <div class="q-text" id="sq-text">Loading...</div>
+      <div class="q-hint" id="sq-hint"></div>
+    </div>
+
+    <div class="sound-game" id="sq-grid"></div>
+
+    <div id="sq-feedback" style="margin-top:10px;"></div>
+    <div id="sq-final" style="margin-top:14px;display:none;">
+      <div class="score-b" id="sq-score">🏆 0/8</div>
+      <button class="btn btn-ghost" style="margin-left:10px;" onclick="restartSoundQuiz()">🔄 Play again</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div style="font-size:15px;font-weight:800;margin-bottom:14px;">💬 Discussion Questions</div>
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      <div style="background:#f0fdf4;border-radius:9px;padding:12px 16px;font-size:14px;font-weight:700;color:var(--green);">1. Do you have a pet? If not, would you like one?</div>
+      <div style="background:#f0fdf4;border-radius:9px;padding:12px 16px;font-size:14px;font-weight:700;color:var(--green);">2. What is the best pet to own? Why?</div>
+      <div style="background:#f0fdf4;border-radius:9px;padding:12px 16px;font-size:14px;font-weight:700;color:var(--green);">3. Are you scared of any animals or creatures?</div>
+      <div style="background:#f0fdf4;border-radius:9px;padding:12px 16px;font-size:14px;font-weight:700;color:var(--green);">4. What animals do you think are cute? Ugly?</div>
+      <div style="background:#f0fdf4;border-radius:9px;padding:12px 16px;font-size:14px;font-weight:700;color:var(--green);">5. Have you ever been to a zoo? What was your favourite animal?</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ KEY LANGUAGE ══════════ -->
+<section id="keylang" class="section">
+  <div class="sec-title">🐄 Key Language</div>
+  <div class="sec-sub">Farm animals · Wild animals · Pets · Insects · Sea creatures</div>
+
+  <div class="part-tabs">
+    <button class="part-tab active" onclick="showPart('kl-farm',this)">🐄 Farm</button>
+    <button class="part-tab" onclick="showPart('kl-wild',this)">🦁 Wild</button>
+    <button class="part-tab" onclick="showPart('kl-pets',this)">🐱 Pets</button>
+    <button class="part-tab" onclick="showPart('kl-other',this)">🐝 Others</button>
+    <button class="part-tab" onclick="showPart('kl-homes',this)">🏠 Homes</button>
+  </div>
+
+  <div class="part-panel active" id="kl-farm">
+    <div class="g-box g-amber">
+      <h3 style="color:var(--amber);">🐄 Farm Animals</h3>
+      <div class="g-rule">horse 🐴 · chicken / hen 🐔 · pig 🐷 · sheep 🐑 · cow 🐄 · goat 🐐 · donkey 🫏 · bull 🐂</div>
+    </div>
+    <div class="card" style="padding:0;overflow:auto;">
+      <table class="animal-tbl">
+        <thead><tr><th>Animal</th><th>Produces</th><th>Baby name</th></tr></thead>
+        <tbody>
+          <tr><td>🐴 horse</td><td>hair, meat</td><td><strong>foal</strong> /fəʊl/</td></tr>
+          <tr><td>🐄 cow</td><td>milk, leather, meat (beef)</td><td><strong>calf</strong> /kɑːf/</td></tr>
+          <tr><td>🐑 sheep</td><td>wool, meat (lamb)</td><td><strong>lamb</strong> /læm/</td></tr>
+          <tr><td>🐷 pig</td><td>meat (pork, bacon, ham)</td><td><strong>piglet</strong> /ˈpɪɡlɪt/</td></tr>
+          <tr><td>🐔 chicken/hen</td><td>eggs, meat (chicken)</td><td><strong>chick</strong> /tʃɪk/</td></tr>
+          <tr><td>🐐 goat</td><td>milk, meat</td><td><strong>kid</strong> /kɪd/</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div style="background:var(--amber-l);border-radius:10px;padding:12px 16px;font-size:13px;border-left:4px solid var(--amber);">
+      💡 <strong>Key vocab:</strong> <em>beef</em> = thịt bò &nbsp;|&nbsp; <em>pork</em> = thịt lợn &nbsp;|&nbsp; <em>lamb</em> = thịt cừu non &nbsp;|&nbsp; <em>wool</em> = len
+    </div>
+  </div>
+
+  <div class="part-panel" id="kl-wild">
+    <div class="g-box g-green">
+      <h3>🦁 Wild & Zoo Animals</h3>
+      <div class="g-rule"><span class="g-hl">wild animal</span> = động vật sống trong điều kiện tự nhiên</div>
+      <div class="g-rule"><span class="g-hl">in the wild</span> = sống tự do ngoài thiên nhiên</div>
+      <div class="g-rule"><span class="g-hl">rare</span> /reər/ = hiếm gặp &nbsp;|&nbsp; <span class="g-hl">endangered</span> = có nguy cơ tuyệt chủng</div>
+      <div class="g-rule"><span class="g-hl">protect</span> = bảo vệ (keep safe)</div>
+    </div>
+    <div class="card">
+      <div style="font-size:14px;font-weight:800;margin-bottom:12px;color:var(--green);">🌍 Wild Animals</div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;font-size:14px;">
+        <span style="background:var(--green-l);padding:6px 14px;border-radius:100px;font-weight:700;">🐘 elephant</span>
+        <span style="background:var(--green-l);padding:6px 14px;border-radius:100px;font-weight:700;">🐍 snake</span>
+        <span style="background:var(--green-l);padding:6px 14px;border-radius:100px;font-weight:700;">🐒 monkey</span>
+        <span style="background:var(--green-l);padding:6px 14px;border-radius:100px;font-weight:700;">🐯 tiger</span>
+        <span style="background:var(--green-l);padding:6px 14px;border-radius:100px;font-weight:700;">🦁 lion</span>
+        <span style="background:var(--green-l);padding:6px 14px;border-radius:100px;font-weight:700;">🦒 giraffe</span>
+        <span style="background:var(--green-l);padding:6px 14px;border-radius:100px;font-weight:700;">🐻 bear</span>
+        <span style="background:var(--green-l);padding:6px 14px;border-radius:100px;font-weight:700;">🐆 leopard</span>
+        <span style="background:var(--green-l);padding:6px 14px;border-radius:100px;font-weight:700;">🐫 camel</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="part-panel" id="kl-pets">
+    <div class="g-box g-green">
+      <h3>🐱 Pets</h3>
+      <div class="g-rule"><span class="g-hl">keep pets</span> = nuôi thú cưng</div>
+      <div class="g-rule"><span class="g-hl">cage</span> /keɪdʒ/ = lồng (birds live in a cage)</div>
+      <div class="g-rule">Common pets: 🐶 dog · 🐱 cat · 🐟 fish · 🐇 rabbit · 🦜 parrot · 🐢 tortoise</div>
+      <div class="g-rule">Unusual pets: 🐸 frog · 🐍 snake · 🕷️ spider</div>
+    </div>
+    <div class="g-box g-amber" style="margin-top:0;">
+      <h3 style="color:var(--amber);">💬 Key Expressions</h3>
+      <div class="g-rule">Take your dog for a <span class="g-hl">walk</span> every day.</div>
+      <div class="g-rule">You must <span class="g-hl">feed</span> your animals and give them <span class="g-hl">water</span> every day.</div>
+      <div class="g-rule">Do you have any <span class="g-hl">pets</span>?</div>
+    </div>
+  </div>
+
+  <div class="part-panel" id="kl-other">
+    <div class="card">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+        <div>
+          <div style="font-size:14px;font-weight:800;color:var(--violet);margin-bottom:10px;">🐝 Insects</div>
+          <div style="display:flex;flex-direction:column;gap:6px;font-size:13px;">
+            <div style="background:var(--violet-l);padding:7px 12px;border-radius:8px;font-weight:700;">🐝 bee /biː/</div>
+            <div style="background:var(--violet-l);padding:7px 12px;border-radius:8px;font-weight:700;">🐜 ant /ænt/</div>
+            <div style="background:var(--violet-l);padding:7px 12px;border-radius:8px;font-weight:700;">🦟 mosquito /məˈskiːtəʊ/</div>
+            <div style="background:var(--violet-l);padding:7px 12px;border-radius:8px;font-weight:700;">🪰 fly /flaɪ/</div>
+            <div style="background:var(--violet-l);padding:7px 12px;border-radius:8px;font-weight:700;">🦋 butterfly /ˈbʌtəflaɪ/</div>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:14px;font-weight:800;color:var(--sky);margin-bottom:10px;">🌊 Sea Creatures</div>
+          <div style="display:flex;flex-direction:column;gap:6px;font-size:13px;">
+            <div style="background:var(--sky-l);padding:7px 12px;border-radius:8px;font-weight:700;">🐳 whale /weɪl/</div>
+            <div style="background:var(--sky-l);padding:7px 12px;border-radius:8px;font-weight:700;">🐬 dolphin /ˈdɒlfɪn/</div>
+            <div style="background:var(--sky-l);padding:7px 12px;border-radius:8px;font-weight:700;">🦈 shark /ʃɑːk/</div>
+            <div style="background:var(--sky-l);padding:7px 12px;border-radius:8px;font-weight:700;">🐙 octopus /ˈɒktəpəs/</div>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:12px;background:#f0fdf4;border-radius:9px;padding:11px 14px;font-size:13px;">
+        💡 <strong>creature</strong> /ˈkriːtʃər/ = sinh vật (any living thing) &nbsp;|&nbsp; <strong>insect</strong> = côn trùng
+      </div>
+    </div>
+  </div>
+
+  <div class="part-panel" id="kl-homes">
+    <div style="font-size:15px;font-weight:800;margin-bottom:12px;color:var(--green);">🏠 Animal Homes</div>
+    <div class="homes-grid">
+      <div class="home-card"><span class="h-emoji">🐶</span><div class="h-animal">Dog</div><div class="h-home">Kennel /ˈkenl/</div></div>
+      <div class="home-card"><span class="h-emoji">🐦</span><div class="h-animal">Bird</div><div class="h-home">Nest /nest/</div></div>
+      <div class="home-card"><span class="h-emoji">🐇</span><div class="h-animal">Rabbit</div><div class="h-home">Hutch /hʌtʃ/</div></div>
+      <div class="home-card"><span class="h-emoji">🐴</span><div class="h-animal">Horse</div><div class="h-home">Stable /ˈsteɪbl/</div></div>
+      <div class="home-card"><span class="h-emoji">🐻</span><div class="h-animal">Bear</div><div class="h-home">Den /den/</div></div>
+      <div class="home-card"><span class="h-emoji">🐝</span><div class="h-animal">Bee</div><div class="h-home">Hive /haɪv/</div></div>
+    </div>
+
+    <div class="card">
+      <div style="font-size:14px;font-weight:800;margin-bottom:12px;">🧩 Match the animal to its home</div>
+      <div id="home-match-score" style="margin-bottom:10px;"></div>
+      <div class="match-grid">
+        <div><h4>🐾 Animal</h4><div id="home-words"></div></div>
+        <div><h4>🏠 Home</h4><div id="home-defs"></div></div>
+      </div>
+      <button class="btn btn-ghost" style="margin-top:10px;" onclick="initHomeMatch()">🔄 Reset</button>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ VOCAB ══════════ -->
+<section id="vocab" class="section">
+  <div class="sec-title">📖 Từ mới — Vocabulary</div>
+  <div class="sec-sub">Nhấn thẻ để lật xem nghĩa & ví dụ.</div>
+  <p style="text-align:center;color:var(--muted);font-size:13px;margin-bottom:14px;">👆 Nhấn thẻ để lật</p>
+  <div class="vfc-grid" id="vfc-grid"></div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;">
+    <button class="btn btn-ghost" onclick="flipAll(true)">👁 Lật tất cả</button>
+    <button class="btn btn-ghost" onclick="flipAll(false)">🔄 Úp lại</button>
+  </div>
+  <div class="search-bar"><input type="text" placeholder="🔍 Tìm từ..." oninput="filterVocab(this.value)"></div>
+  <div class="card" style="padding:0;overflow:auto;">
+    <table class="vtable">
+      <thead><tr><th>Word</th><th>Pronunciation</th><th>Type</th><th>Meaning</th><th>Example</th></tr></thead>
+      <tbody id="vtbody"></tbody>
+    </table>
+  </div>
+</section>
+
+<!-- ══════════ LISTENING ══════════ -->
+<section id="listening" class="section">
+  <div class="sec-title">🎧 Listening</div>
+  <div class="sec-sub">Nghe về pets, farm animals và wild animals</div>
+
+  <div class="card">
+    <div style="font-size:15px;font-weight:800;margin-bottom:6px;">🔊 Audio — Animals</div>
+    <p style="color:var(--muted);font-size:13px;margin-bottom:14px;">Nghe audio từ giáo viên → hoàn thành Task 1 & 2.</p>
+    <div style="background:linear-gradient(135deg,#064e3b,#059669);border-radius:12px;padding:20px;color:#fff;text-align:center;margin-bottom:18px;">
+      <div style="font-size:40px;margin-bottom:8px;">🎧</div>
+      <div style="font-weight:700;font-size:15px;margin-bottom:4px;">Animals — Audio</div>
+      <div style="font-size:12px;opacity:.7;margin-bottom:14px;">Click to open & listen</div>
+      <a href="#" class="audio-btn">▶️ Open audio file</a>
+    </div>
+
+    <div style="font-size:15px;font-weight:800;margin-bottom:10px;">✏️ Task 1: Fill in the blanks</div>
+    <div style="background:#f0fdf4;border-radius:10px;padding:16px 18px;font-size:14px;line-height:2.6;margin-bottom:14px;border-left:4px solid var(--green);">
+      <input class="blank" style="width:170px" data-ans="pets and farm animals" placeholder="(1)___"> play vital roles in people's lives by providing
+      <input class="blank" style="width:130px" data-ans="companionship" placeholder="(2)___"> and
+      <input class="blank" style="width:100px" data-ans="resources" placeholder="(3)___">. Pets, like dogs, cats, or rabbits, bring joy and emotional support to families. They help reduce stress and
+      <input class="blank" style="width:110px" data-ans="loneliness" placeholder="(4)___">, offering love and
+      <input class="blank" style="width:90px" data-ans="loyalty" placeholder="(5)___">. Caring for pets teaches
+      <input class="blank" style="width:130px" data-ans="responsibility" placeholder="(6)___">, such as
+      <input class="blank" style="width:90px" data-ans="feeding" placeholder="(7)___">,
+      <input class="blank" style="width:100px" data-ans="grooming" placeholder="(8)___">, or walking them daily.
+      Farm animals, including cows, chickens, and goats, are essential for communities. They support their
+      <input class="blank" style="width:110px" data-ans="livelihood" placeholder="(9)___"> and provide fresh products, strengthening
+      <input class="blank" style="width:150px" data-ans="community bonds" placeholder="(10)___">.<br><br>
+      <input class="blank" style="width:80px" data-ans="whales" placeholder="(11)___">, such as tigers, birds, or
+      <input class="blank" style="width:80px" data-ans="whales" placeholder="(12)___">, live freely in
+      <input class="blank" style="width:80px" data-ans="forests" placeholder="(13)___">, oceans, or
+      <input class="blank" style="width:100px" data-ans="mountains" placeholder="(14)___">. Their beauty and strength inspire us to protect nature and our planet's
+      <input class="blank" style="width:110px" data-ans="ecosystems" placeholder="(15)___">. Wild animals remind us to live in
+      <input class="blank" style="width:90px" data-ans="harmony" placeholder="(16)___"> with nature.
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <button class="btn btn-green" onclick="checkListenFill()">✅ Kiểm tra</button>
+      <button class="btn btn-ghost" onclick="resetListenFill()">🔄 Làm lại</button>
+    </div>
+    <div id="listen-result" style="margin-top:10px;"></div>
+  </div>
+
+  <div class="card">
+    <div style="font-size:15px;font-weight:800;margin-bottom:6px;">🎬 Video 1 — At the Zoo</div>
+    <p style="color:var(--muted);font-size:13px;margin-bottom:12px;">Xem video → trả lời câu hỏi bên dưới</p>
+    <div class="vid-wrap">
+      <iframe src="https://www.youtube.com/embed/l3OMaL5SWFQ" title="Animals at the Zoo" frameborder="0" allowfullscreen></iframe>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px;">
+      <div style="background:#f0fdf4;border-radius:9px;padding:11px 15px;font-size:14px;font-weight:700;color:var(--green);">1. What animals do you see in this video?</div>
+      <div style="background:#f0fdf4;border-radius:9px;padding:11px 15px;font-size:14px;font-weight:700;color:var(--green);">2. Find 3 facts about each animal.</div>
+    </div>
+    <textarea rows="4" style="width:100%;padding:12px;border:2px solid var(--border);border-radius:10px;font-family:'Nunito',sans-serif;font-size:14px;outline:none;resize:vertical;" placeholder="Your notes here..." onfocus="this.style.borderColor='var(--green)'" onblur="this.style.borderColor='var(--border)'"></textarea>
+  </div>
+
+  <div class="card">
+    <div style="font-size:15px;font-weight:800;margin-bottom:6px;">🎬 Video 2 — Animal Homes</div>
+    <div class="vid-wrap">
+      <iframe src="https://www.youtube.com/embed/a1nmq_rsBEM" title="Animal Homes" frameborder="0" allowfullscreen></iframe>
+    </div>
+  </div>
+
+  <div class="card">
+    <div style="font-size:15px;font-weight:800;margin-bottom:12px;">❓ Task 2: Multiple Choice (optional)</div>
+    <div class="prog-wrap"><div class="prog-fill" id="listen-quiz-prog" style="width:0%"></div></div>
+    <div id="listen-quiz"></div>
+    <div id="listen-quiz-score" style="margin-top:12px;"></div>
+  </div>
+</section>
+
+<!-- ══════════ PRACTICE ══════════ -->
+<section id="practice" class="section">
+  <div class="sec-title">🗣️ Practice</div>
+  <div class="sec-sub">Role Play · Presentation · Describing Animals</div>
+
+  <div class="part-tabs">
+    <button class="part-tab active" onclick="showPart('pr-roleplay',this)">🎭 Role Play</button>
+    <button class="part-tab" onclick="showPart('pr-present',this)">🎤 Presentation</button>
+  </div>
+
+  <div class="part-panel active" id="pr-roleplay">
+    <div class="card">
+      <div style="font-size:15px;font-weight:800;margin-bottom:10px;">🎭 Role Play: At the Zoo</div>
+      <p style="color:var(--muted);font-size:13px;margin-bottom:16px;">One student is the <strong>Zoo Keeper</strong> (ZK), the other is the <strong>Visitor</strong> (V). Ask & answer about 3–4 animals, then switch roles.</p>
+
+      <div style="background:var(--amber-l);border-radius:10px;padding:14px 18px;margin-bottom:16px;border-left:4px solid var(--amber);">
+        <strong style="font-size:13px;color:var(--amber);">📋 Instructions:</strong>
+        <ul style="font-size:13px;margin-top:8px;padding-left:18px;line-height:2;">
+          <li>Ask about appearance, size, abilities, habitat, and food</li>
+          <li>Use the animal table and your own ideas</li>
+          <li>After that, switch roles and talk about different animals</li>
+          <li>Finally, share your opinions: most interesting? most dangerous? like as a pet?</li>
+        </ul>
+      </div>
+
+      <div style="font-size:14px;font-weight:800;margin-bottom:10px;">💬 Example Dialogue</div>
+      <div class="chat">
+        <div><div class="bub-label">👩 Visitor (V)</div><div class="bubble bub-a">Excuse me, can you tell me about the elephants?</div></div>
+        <div style="align-self:flex-end"><div class="bub-label" style="text-align:right">🧑‍💼 Zoo Keeper (ZK)</div><div class="bubble bub-b">Of course! Elephants are very big animals. They have long trunks and big ears.</div></div>
+        <div><div class="bub-label">👩 V</div><div class="bubble bub-a">Wow! What can they do with their trunks?</div></div>
+        <div style="align-self:flex-end"><div class="bub-label" style="text-align:right">🧑‍💼 ZK</div><div class="bubble bub-b">They can eat, drink, and carry things. They are very strong!</div></div>
+        <div><div class="bub-label">👩 V</div><div class="bubble bub-a">Where do they live?</div></div>
+        <div style="align-self:flex-end"><div class="bub-label" style="text-align:right">🧑‍💼 ZK</div><div class="bubble bub-b">They live in Africa and Asia. In the wild, they live in the savannah.</div></div>
+        <div><div class="bub-label">👩 V</div><div class="bubble bub-a">What do they eat?</div></div>
+        <div style="align-self:flex-end"><div class="bub-label" style="text-align:right">🧑‍💼 ZK</div><div class="bubble bub-b">They eat grass, leaves, and fruits. They eat a LOT every day!</div></div>
+      </div>
+    </div>
+
+    <div class="card" style="padding:0;overflow:auto;">
+      <div style="padding:14px 18px;font-size:14px;font-weight:800;border-bottom:1px solid var(--border);">🗺️ Animal Reference Table</div>
+      <table class="animal-tbl" style="font-size:12px;">
+        <thead><tr><th>Animal</th><th>Shape / Appearance</th><th>Size</th><th>Abilities</th><th>Habitat</th><th>Food</th></tr></thead>
+        <tbody>
+          <tr><td>🐘 Elephant</td><td>Large, grey, trunk, tusks</td><td>Very big</td><td>Walk, swim, carry things</td><td>Savannah / Zoo</td><td>Grass, fruits</td></tr>
+          <tr><td>🐫 Camel</td><td>Humps, long legs, furry</td><td>Big</td><td>Walk long distances</td><td>Desert</td><td>Grass, shrubs</td></tr>
+          <tr><td>🦜 Parrot</td><td>Colourful feathers, beak</td><td>Small</td><td>Fly, mimic sounds</td><td>Jungle / Forest</td><td>Fruits</td></tr>
+          <tr><td>🦒 Giraffe</td><td>Long neck, spots, tall</td><td>Very tall</td><td>Run fast, reach high leaves</td><td>Savannah</td><td>Leaves, shrubs</td></tr>
+          <tr><td>🐯 Tiger</td><td>Orange, black stripes</td><td>Big</td><td>Run, swim, climb</td><td>Forests, Asia</td><td>Meat (deer, fish)</td></tr>
+          <tr><td>🐬 Dolphin</td><td>Grey, smooth, fins</td><td>Medium</td><td>Swim fast, jump, communicate</td><td>Ocean</td><td>Fish, squid</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="part-panel" id="pr-present">
+    <div class="card">
+      <div style="font-size:15px;font-weight:800;margin-bottom:10px;">🎤 Animal Expert Presentation (5–10 mins)</div>
+      <p style="color:var(--muted);font-size:13px;margin-bottom:14px;">Chọn MỘT con vật yêu thích và trả lời 6 câu hỏi dưới đây để làm bài thuyết trình.</p>
+      <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;">
+        <div style="background:#f0fdf4;border-radius:9px;padding:11px 15px;font-size:14px;font-weight:700;color:var(--green);">1. What animal is it?</div>
+        <div style="background:#f0fdf4;border-radius:9px;padding:11px 15px;font-size:14px;font-weight:700;color:var(--green);">2. What does it look like?</div>
+        <div style="background:#f0fdf4;border-radius:9px;padding:11px 15px;font-size:14px;font-weight:700;color:var(--green);">3. What does it eat?</div>
+        <div style="background:#f0fdf4;border-radius:9px;padding:11px 15px;font-size:14px;font-weight:700;color:var(--green);">4. Where does it live?</div>
+        <div style="background:#f0fdf4;border-radius:9px;padding:11px 15px;font-size:14px;font-weight:700;color:var(--green);">5. What is its home called?</div>
+        <div style="background:#f0fdf4;border-radius:9px;padding:11px 15px;font-size:14px;font-weight:700;color:var(--green);">6. Why do you like it?</div>
+      </div>
+      <div style="background:var(--green-l);border-radius:9px;padding:12px 16px;font-size:13px;margin-bottom:12px;border-left:4px solid var(--green);">
+        <strong>📌 Example:</strong><br>
+        <em>My favourite animal is a lion. It is a mammal. It has a mane and four legs. It eats meat. It lives in Africa, in a cave. I like lions because they are strong and beautiful.</em>
+      </div>
+      <textarea id="present-area" rows="7" style="width:100%;padding:14px;border:2px solid var(--border);border-radius:10px;font-family:'Nunito',sans-serif;font-size:14px;outline:none;resize:vertical;line-height:1.7;" placeholder="Write your presentation here..." onfocus="this.style.borderColor='var(--green)'" onblur="this.style.borderColor='var(--border)'" oninput="countWords('present-area','present-wc')"></textarea>
+      <div style="text-align:right;margin-top:4px;font-size:12px;color:var(--muted);"><span id="present-wc">0</span> words</div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ ACTIVITIES ══════════ -->
+<section id="activities" class="section">
+  <div class="sec-title">🎮 Activities</div>
+  <div class="sec-sub">Luyện từ vựng và ngữ pháp qua các hoạt động tương tác</div>
+
+  <div class="act-tabs">
+    <button class="act-tab active" onclick="showAct('cat-sort',this)">🗂 Phân loại</button>
+    <button class="act-tab" onclick="showAct('fill-act',this)">✏️ Điền từ</button>
+    <button class="act-tab" onclick="showAct('sort-act',this)">🔀 Sắp xếp</button>
+    <button class="act-tab" onclick="showAct('quiz-act',this)">❓ Trắc nghiệm</button>
+    <button class="act-tab" onclick="showAct('crossword',this)">🔤 Crossword</button>
+  </div>
+
+  <!-- CATEGORY SORT -->
+  <div class="act-panel active" id="act-cat-sort">
+    <div class="card">
+      <h3 style="font-size:16px;font-weight:800;margin-bottom:6px;">🗂 Task 1: Sort the animals into the correct groups</h3>
+      <p style="color:var(--muted);font-size:13px;margin-bottom:14px;">Nhấn vào con vật rồi nhấn vào cột phù hợp để phân loại.</p>
+      <div id="cat-pool" class="cat-pool"></div>
+      <div class="cat-board">
+        <div class="cat-col cat-farm">
+          <div class="cat-header">🐄 Farm Animals</div>
+          <div class="cat-body" id="cat-farm" onclick="dropToCat('farm',event)"></div>
+        </div>
+        <div class="cat-col cat-wild">
+          <div class="cat-header">🦁 Wild Animals</div>
+          <div class="cat-body" id="cat-wild" onclick="dropToCat('wild',event)"></div>
+        </div>
+        <div class="cat-col cat-insect">
+          <div class="cat-header">🐝 Insects</div>
+          <div class="cat-body" id="cat-insect" onclick="dropToCat('insect',event)"></div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;">
+        <button class="btn btn-green" onclick="checkCatSort()">✅ Kiểm tra</button>
+        <button class="btn btn-ghost" onclick="buildCatSort()">🔄 Reset</button>
+      </div>
+      <div id="cat-result" style="margin-top:10px;"></div>
+    </div>
+  </div>
+
+  <!-- FILL -->
+  <div class="act-panel" id="act-fill-act">
+    <div class="card">
+      <h3 style="font-size:16px;font-weight:800;margin-bottom:6px;">✏️ Task 2: Complete the sentences</h3>
+      <p style="color:var(--muted);font-size:13px;margin-bottom:14px;">Điền tên động vật hoặc từ thích hợp.</p>
+      <div id="fill-act-qs"></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;">
+        <button class="btn btn-green" onclick="checkFillAct()">✅ Kiểm tra</button>
+        <button class="btn btn-ghost" onclick="resetFillAct()">🔄 Làm lại</button>
+      </div>
+      <div id="fill-act-result" style="margin-top:10px;"></div>
+    </div>
+  </div>
+
+  <!-- SORT -->
+  <div class="act-panel" id="act-sort-act">
+    <div class="card">
+      <h3 style="font-size:16px;font-weight:800;margin-bottom:6px;">🔀 Sắp xếp thành câu hoàn chỉnh</h3>
+      <div id="sort-qs"></div>
+    </div>
+  </div>
+
+  <!-- QUIZ -->
+  <div class="act-panel" id="act-quiz-act">
+    <div class="card">
+      <h3 style="font-size:16px;font-weight:800;margin-bottom:14px;">❓ Trắc nghiệm tổng hợp</h3>
+      <div class="prog-wrap"><div class="prog-fill" id="quiz-prog" style="width:0%"></div></div>
+      <div id="quiz-items"></div>
+      <div id="quiz-total" style="margin-top:14px;"></div>
+    </div>
+  </div>
+
+  <!-- CROSSWORD LINK -->
+  <div class="act-panel" id="act-crossword">
+    <div class="card">
+      <div style="font-size:15px;font-weight:800;margin-bottom:10px;">🔤 Animals Crossword Puzzle</div>
+      <p style="color:var(--muted);font-size:13px;margin-bottom:16px;">Giải ô chữ về động vật — click link để chơi online!</p>
+      <a href="https://crosswordlabs.com/view/animals-30188" target="_blank"
+        style="display:flex;align-items:center;gap:14px;padding:18px 20px;background:linear-gradient(135deg,#f0fdf4,#dcfce7);border-radius:14px;border:2px solid #bbf7d0;text-decoration:none;transition:all .2s;"
+        onmouseover="this.style.borderColor='var(--green)'" onmouseout="this.style.borderColor='#bbf7d0'">
+        <span style="font-size:40px;">🔤</span>
+        <div>
+          <div style="font-size:15px;font-weight:800;color:var(--green);">Animals Crossword</div>
+          <div style="font-size:13px;color:var(--muted);margin-top:2px;">crosswordlabs.com · Click to play</div>
+        </div>
+        <span style="font-size:20px;color:var(--green);margin-left:auto;">→</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════ HOMEWORK ══════════ -->
+<section id="homework" class="section">
+  <div class="sec-title">📝 Homework</div>
+  <div class="sec-sub">Bài tập về nhà — hoàn thành sau buổi học</div>
+
+  <div class="hw-box">
+    <h4>📌 Task 1: Sort the words — Farm / Wild / Insects</h4>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">horse, monkey, goat, fly, bull, bee, elephant, pig, mosquito, tiger, donkey, camel, ant, leopard, butterfly</p>
+    <div id="hw-cat-pool" class="cat-pool"></div>
+    <div class="cat-board">
+      <div class="cat-col cat-farm">
+        <div class="cat-header">🐄 Farm Animals</div>
+        <div class="cat-body" id="hw-cat-farm" onclick="hwDropToCat('farm',event)"></div>
+      </div>
+      <div class="cat-col cat-wild">
+        <div class="cat-header">🦁 Wild Animals</div>
+        <div class="cat-body" id="hw-cat-wild" onclick="hwDropToCat('wild',event)"></div>
+      </div>
+      <div class="cat-col cat-insect">
+        <div class="cat-header">🐝 Insects</div>
+        <div class="cat-body" id="hw-cat-insect" onclick="hwDropToCat('insect',event)"></div>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;">
+      <button class="btn btn-green" onclick="checkHwCat()">✅ Kiểm tra</button>
+      <button class="btn btn-ghost" onclick="buildHwCat()">🔄 Reset</button>
+    </div>
+    <div id="hw-cat-result" style="margin-top:10px;"></div>
+  </div>
+
+  <div class="hw-box">
+    <h4>📌 Task 2: Complete the sentences</h4>
+    <div id="hw2-qs"></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;">
+      <button class="btn btn-green" onclick="checkHw2()">✅ Kiểm tra</button>
+      <button class="btn btn-ghost" onclick="resetHw2()">🔄 Làm lại</button>
+    </div>
+    <div id="hw2-result" style="margin-top:10px;"></div>
+  </div>
+
+  <div class="hw-box">
+    <h4>📌 Task 3: Match animal → meat → baby</h4>
+    <div class="card" style="padding:0;overflow:auto;margin-top:0;">
+      <table class="animal-tbl" style="font-size:13px;">
+        <thead><tr><th>Animal</th><th>Meat <input id="hw3-m-check" type="checkbox" style="margin-left:6px;" onchange="toggleHw3()"> show</th><th>Baby <input id="hw3-b-check" type="checkbox" style="margin-left:6px;" onchange="toggleHw3()"> show</th></tr></thead>
+        <tbody id="hw3-body"></tbody>
+      </table>
+    </div>
+    <p style="font-size:12px;color:var(--muted);margin-top:8px;">💡 Tick "show" để xem đáp án. Cố gắng nhớ trước khi nhìn!</p>
+  </div>
+
+  <div class="hw-box">
+    <h4>🔁 Revise Vocabulary</h4>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:10px;">Ôn lại tất cả flashcard trong tab <strong>Từ mới</strong>. Cố gắng nhớ:</p>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;font-size:13px;">
+      <span style="background:var(--amber-l);color:var(--amber);padding:5px 12px;border-radius:100px;font-weight:700;">6 farm animals + baby names</span>
+      <span style="background:var(--green-l);color:var(--green);padding:5px 12px;border-radius:100px;font-weight:700;">5 wild animals</span>
+      <span style="background:var(--violet-l);color:var(--violet);padding:5px 12px;border-radius:100px;font-weight:700;">5 insects / sea creatures</span>
+      <span style="background:var(--sky-l);color:var(--sky);padding:5px 12px;border-radius:100px;font-weight:700;">6 animal homes</span>
+    </div>
+  </div>
+
+  <div class="card" style="background:linear-gradient(135deg,var(--green-l),#f0fdf4);">
+    <div style="font-size:15px;font-weight:800;margin-bottom:12px;">✅ Wrap Up — Can you do these?</div>
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:14px;font-weight:700;"><input type="checkbox" style="width:18px;height:18px;accent-color:var(--green);"> I can talk about different animals.</label>
+      <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:14px;font-weight:700;"><input type="checkbox" style="width:18px;height:18px;accent-color:var(--green);"> I can use the Present Simple correctly.</label>
+      <label style="display:flex;align-items:center;gap:10px;cursor:pointer;font-size:14px;font-weight:700;"><input type="checkbox" style="width:18px;height:18px;accent-color:var(--green);"> I can use frequency adverbs.</label>
+    </div>
+  </div>
+</section>
 <script>
 const vocabData=[
   {w:'pet',p:'/pet/',t:'noun',m:'Thú cưng',ex:'I have a <strong>pet</strong> cat at home.'},
