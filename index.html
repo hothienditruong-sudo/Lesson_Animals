@@ -1,0 +1,524 @@
+bash
+
+cat >> /tmp/lesson8_part1.html << 'JSEOF'
+<script>
+const vocabData=[
+  {w:'pet',p:'/pet/',t:'noun',m:'Thú cưng',ex:'I have a <strong>pet</strong> cat at home.'},
+  {w:'farm animal',p:'/fɑːm ˈænɪml/',t:'phrase',m:'Động vật nông trại',ex:'Cows and pigs are <strong>farm animals</strong>.'},
+  {w:'wild animal',p:'/waɪld ˈænɪml/',t:'phrase',m:'Động vật hoang dã',ex:'Tigers are <strong>wild animals</strong>.'},
+  {w:'endangered',p:'/ɪnˈdeɪndʒəd/',t:'adj',m:'Có nguy cơ tuyệt chủng',ex:'Tigers are <strong>endangered</strong> animals.'},
+  {w:'rare',p:'/reər/',t:'adj',m:'Hiếm gặp',ex:'Snow leopards are very <strong>rare</strong>.'},
+  {w:'protect',p:'/prəˈtekt/',t:'verb',m:'Bảo vệ',ex:'We must <strong>protect</strong> endangered animals.'},
+  {w:'cage',p:'/keɪdʒ/',t:'noun',m:'Lồng (nhốt chim/vật)',ex:'The parrot lives in a <strong>cage</strong>.'},
+  {w:'kennel',p:'/ˈkenl/',t:'noun',m:'Chuồng chó',ex:'The dog sleeps in his <strong>kennel</strong>.'},
+  {w:'stable',p:'/ˈsteɪbl/',t:'noun',m:'Chuồng ngựa',ex:'The horse lives in a <strong>stable</strong>.'},
+  {w:'nest',p:'/nest/',t:'noun',m:'Tổ (chim)',ex:'The bird built a <strong>nest</strong> in the tree.'},
+  {w:'hutch',p:'/hʌtʃ/',t:'noun',m:'Chuồng thỏ',ex:'My rabbit lives in a <strong>hutch</strong> in the garden.'},
+  {w:'den',p:'/den/',t:'noun',m:'Hang (gấu)',ex:'The bear sleeps in its <strong>den</strong> in winter.'},
+  {w:'foal',p:'/fəʊl/',t:'noun',m:'Ngựa con',ex:'The <strong>foal</strong> stayed close to its mother.'},
+  {w:'calf',p:'/kɑːf/',t:'noun',m:'Bê con (bò con)',ex:'The farmer fed the <strong>calf</strong> every morning.'},
+  {w:'piglet',p:'/ˈpɪɡlɪt/',t:'noun',m:'Lợn con',ex:'The <strong>piglet</strong> followed its mother.'},
+  {w:'chick',p:'/tʃɪk/',t:'noun',m:'Gà con',ex:'The little <strong>chick</strong> chirped loudly.'},
+  {w:'lamb',p:'/læm/',t:'noun',m:'Cừu non / thịt cừu',ex:'A <strong>lamb</strong> is a baby sheep.'},
+  {w:'feed',p:'/fiːd/',t:'verb',m:'Cho ăn',ex:'I <strong>feed</strong> my dog twice a day.'},
+  {w:'companionship',p:'/kəmˈpænɪənʃɪp/',t:'noun',m:'Tình bạn đồng hành',ex:'Dogs give people great <strong>companionship</strong>.'},
+  {w:'responsibility',p:'/rɪˌspɒnsəˈbɪləti/',t:'noun',m:'Trách nhiệm',ex:'Having a pet teaches <strong>responsibility</strong>.'},
+  {w:'loyalty',p:'/ˈlɔɪəlti/',t:'noun',m:'Lòng trung thành',ex:'Dogs are famous for their <strong>loyalty</strong>.'},
+  {w:'ecosystem',p:'/ˈiːkəʊsɪstəm/',t:'noun',m:'Hệ sinh thái',ex:'We must protect our planet\'s <strong>ecosystems</strong>.'},
+  {w:'habitat',p:'/ˈhæbɪtæt/',t:'noun',m:'Môi trường sống',ex:'The forest is the <strong>habitat</strong> of many animals.'},
+  {w:'harmony',p:'/ˈhɑːməni/',t:'noun',m:'Sự hài hoà',ex:'We should live in <strong>harmony</strong> with nature.'},
+];
+const vEmoji=['🐾','🐄','🦁','⚠️','💎','🛡️','🔒','🏠','🐴','🐦','🐇','🐻','🐴','🐄','🐷','🐥','🐑','🍖','🤝','📚','❤️','🌿','🏔️','☮️'];
+const typeMap={noun:'t-noun',verb:'t-verb',phrase:'t-phrase',adj:'t-adj'};
+const typeLbl={noun:'Noun',verb:'Verb',phrase:'Phrase',adj:'Adjective'};
+
+// ── NAV ──
+function showSection(id,btn){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById(id).classList.add('active'); btn.classList.add('active');
+}
+function showPart(id,btn){
+  const allPanels=document.querySelectorAll('.part-panel');
+  const groups={
+    'kl-':['kl-farm','kl-wild','kl-pets','kl-other','kl-homes'],
+    'pr-':['pr-roleplay','pr-present'],
+  };
+  let grp=null;
+  for(const [prefix,ids] of Object.entries(groups)){if(ids.includes(id)){grp=ids;break;}}
+  if(grp) grp.forEach(pid=>document.getElementById(pid).classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.closest('div').querySelectorAll('.part-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+}
+function showAct(id,btn){
+  document.querySelectorAll('.act-panel').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.act-tab').forEach(b=>b.classList.remove('active'));
+  document.getElementById('act-'+id).classList.add('active'); btn.classList.add('active');
+}
+
+// ── SOUND QUIZ ──
+const soundQuestions=[
+  {text:'"Moo! Moo!"',hint:'This animal gives us milk.',animals:['🐄 cow','🐷 pig','🐴 horse','🐑 sheep'],ans:'🐄 cow'},
+  {text:'"Oink! Oink!"',hint:'This animal gives us bacon.',animals:['🐄 cow','🐷 pig','🐐 goat','🐔 chicken'],ans:'🐷 pig'},
+  {text:'"Cock-a-doodle-doo!"',hint:'This animal wakes farmers up in the morning.',animals:['🐦 bird','🐔 chicken','🦜 parrot','🦢 swan'],ans:'🐔 chicken'},
+  {text:'"Roar! Roar!"',hint:'This is the king of the jungle.',animals:['🦁 lion','🐯 tiger','🐻 bear','🐆 leopard'],ans:'🦁 lion'},
+  {text:'"Buzz! Buzz!"',hint:'This insect makes honey.',animals:['🪰 fly','🐜 ant','🦟 mosquito','🐝 bee'],ans:'🐝 bee'},
+  {text:'"Hee-haw! Hee-haw!"',hint:'This animal works on the farm and carries heavy loads.',animals:['🐴 horse','🫏 donkey','🐄 cow','🐐 goat'],ans:'🫏 donkey'},
+  {text:'"Click-click! (echolocation)"',hint:'This sea creature is very intelligent and friendly.',animals:['🦈 shark','🐳 whale','🐬 dolphin','🐙 octopus'],ans:'🐬 dolphin'},
+  {text:'"Hoot! Hoot!"',hint:'This bird hunts at night and is very wise.',animals:['🦅 eagle','🦉 owl','🦆 duck','🦜 parrot'],ans:'🦉 owl'},
+];
+let sqIdx=0,sqScore=0,sqDone=false;
+function buildSoundQuiz(){
+  sqIdx=0;sqScore=0;sqDone=false;
+  document.getElementById('sq-total').textContent=soundQuestions.length;
+  document.getElementById('sq-final').style.display='none';
+  document.getElementById('sq-feedback').innerHTML='';
+  renderSoundQ();
+}
+function renderSoundQ(){
+  if(sqIdx>=soundQuestions.length){endSoundQuiz();return;}
+  const q=soundQuestions[sqIdx];
+  document.getElementById('sq-round').textContent=sqIdx+1;
+  document.getElementById('sq-text').textContent=q.text;
+  document.getElementById('sq-hint').textContent='🔍 Hint: '+q.hint;
+  const shuffled=[...q.animals].sort(()=>Math.random()-.5);
+  document.getElementById('sq-grid').innerHTML=shuffled.map(a=>`
+    <div class="sound-card" onclick="answerSound(this,'${a}','${q.ans}')">
+      <span class="s-emoji">${a.split(' ')[0]}</span>
+      <div class="s-name">${a.split(' ').slice(1).join(' ')}</div>
+      <span class="s-tick">✅</span>
+    </div>`).join('');
+  document.getElementById('sq-feedback').innerHTML='';
+}
+function answerSound(el,chosen,ans){
+  if(el.classList.contains('correct')||el.classList.contains('wrong')) return;
+  document.querySelectorAll('.sound-card').forEach(c=>c.style.pointerEvents='none');
+  if(chosen===ans){
+    el.classList.add('correct');sqScore++;
+    document.getElementById('sq-feedback').innerHTML='<div class="result-msg ok">🎉 Correct! Well done!</div>';
+  } else {
+    el.classList.add('wrong');
+    document.querySelectorAll('.sound-card').forEach(c=>{if(c.querySelector('.s-name')&&ans.includes(c.querySelector('.s-name').textContent))c.classList.add('correct');});
+    document.getElementById('sq-feedback').innerHTML=`<div class="result-msg bad">❌ The answer was: ${ans}</div>`;
+  }
+  setTimeout(()=>{sqIdx++;renderSoundQ();},1200);
+}
+function endSoundQuiz(){
+  document.getElementById('sq-box').style.display='none';
+  document.getElementById('sq-grid').innerHTML='';
+  document.getElementById('sq-feedback').innerHTML='';
+  document.getElementById('sq-final').style.display='flex';
+  document.getElementById('sq-score').textContent=`🏆 ${sqScore}/${soundQuestions.length}`;
+}
+function restartSoundQuiz(){
+  document.getElementById('sq-box').style.display='block';
+  buildSoundQuiz();
+}
+
+// ── VFC ──
+function buildVfc(){
+  document.getElementById('vfc-grid').innerHTML=vocabData.map((v,i)=>
+    `<div class="vfc" onclick="this.classList.toggle('flipped')">
+      <div class="vfc-inner">
+        <div class="vfc-front"><div class="ve">${vEmoji[i]||'🐾'}</div>
+          <div class="vw">${v.w}</div><div class="vp">${v.p}</div></div>
+        <div class="vfc-back"><div class="vm">${v.m}</div><div class="vex">${v.ex}</div></div>
+      </div></div>`).join('');
+}
+function flipAll(open){document.querySelectorAll('.vfc').forEach(c=>open?c.classList.add('flipped'):c.classList.remove('flipped'));}
+function buildVtable(data){
+  document.getElementById('vtbody').innerHTML=data.map(v=>
+    `<tr><td><span class="wrd">${v.w}</span></td><td><span class="pron">${v.p}</span></td>
+    <td><span class="tbadge ${typeMap[v.t]||'t-noun'}">${typeLbl[v.t]||v.t}</span></td>
+    <td>${v.m}</td><td style="color:var(--muted);font-size:12px;">${v.ex}</td></tr>`).join('');
+}
+function filterVocab(q){buildVtable(vocabData.filter(v=>v.w.toLowerCase().includes(q.toLowerCase())||v.m.toLowerCase().includes(q.toLowerCase())));}
+
+// ── ANIMAL HOME MATCH ──
+const homePairs=[
+  {w:'🐶 Dog',d:'Kennel'},{w:'🐦 Bird',d:'Nest'},{w:'🐇 Rabbit',d:'Hutch'},
+  {w:'🐴 Horse',d:'Stable'},{w:'🐻 Bear',d:'Den'},{w:'🐝 Bee',d:'Hive'},
+];
+let homeSel=null,homeScore=0;
+function initHomeMatch(){
+  homeSel=null;homeScore=0;
+  const ws=[...homePairs].sort(()=>Math.random()-.5);
+  const ds=[...homePairs].sort(()=>Math.random()-.5);
+  document.getElementById('home-words').innerHTML=ws.map(p=>`<div class="match-item" data-w="${p.w}" onclick="selHomeMatch(this,'w')">${p.w}</div>`).join('');
+  document.getElementById('home-defs').innerHTML=ds.map(p=>`<div class="match-item" data-w="${p.w}" onclick="selHomeMatch(this,'d')">${p.d}</div>`).join('');
+  document.getElementById('home-match-score').innerHTML='';
+}
+function selHomeMatch(el,type){
+  if(el.classList.contains('correct')) return;
+  if(!homeSel){el.classList.add('selected');homeSel={el,type};return;}
+  if(homeSel.type===type){
+    document.querySelectorAll('.match-item.selected').forEach(e=>e.classList.remove('selected'));
+    el.classList.add('selected');homeSel={el,type};return;
+  }
+  const wEl=type==='w'?el:homeSel.el, dEl=type==='d'?el:homeSel.el;
+  if(wEl.dataset.w===dEl.dataset.w){
+    wEl.classList.remove('selected');dEl.classList.remove('selected');
+    wEl.classList.add('correct');dEl.classList.add('correct');homeScore++;
+    const total=document.querySelectorAll('#home-words .match-item').length;
+    document.getElementById('home-match-score').innerHTML=`<div class="score-b">⭐ ${homeScore}/${total}</div>${homeScore===total?'<div class="result-msg ok">🎉 Perfect!</div>':''}`;
+  } else {
+    wEl.classList.add('wrong');dEl.classList.add('wrong');
+    setTimeout(()=>{wEl.classList.remove('wrong','selected');dEl.classList.remove('wrong','selected');},500);
+  }
+  homeSel=null;
+}
+
+// ── LISTEN FILL ──
+function checkListenFill(){
+  let ok=0,total=0;
+  document.querySelectorAll('#listening .blank').forEach(inp=>{
+    total++;
+    const v=inp.value.trim().toLowerCase(),a=inp.dataset.ans.toLowerCase();
+    inp.classList.toggle('ok',v===a);inp.classList.toggle('bad',v!==a);
+    if(v===a) ok++;
+  });
+  document.getElementById('listen-result').innerHTML=
+    `<div class="result-msg ${ok===total?'ok':'bad'}">${ok===total?'🎉 Hoàn hảo!':'⚠️ Cố lên!'} Đúng ${ok}/${total}</div>`;
+}
+function resetListenFill(){
+  document.querySelectorAll('#listening .blank').forEach(inp=>{inp.value='';inp.className='blank';});
+  document.getElementById('listen-result').innerHTML='';
+}
+
+// ── LISTEN QUIZ ──
+const listenQuizData=[
+  {q:'What do pets like dogs and cats provide to families?',opts:['Money and clothes','Joy and emotional support','Eggs and milk'],ans:1},
+  {q:'What does caring for pets teach people?',opts:['Responsibility','Relaxation','Farming skills'],ans:0},
+  {q:'Which farm animals are mentioned in the audio?',opts:['Cows, chickens, goats','Horses, snakes, spiders','Tigers, whales, dolphins'],ans:0},
+  {q:'What products do farm animals provide?',opts:['Plastic and paper','Wool, milk, eggs, and meat','Shoes and computers'],ans:1},
+  {q:'Where do wild animals live?',opts:['In houses and cages','In zoos only','In forests, oceans, or mountains'],ans:2},
+  {q:'Why is it important to protect wild animals?',opts:['Because they are dangerous','Because they inspire us and balance nature','Because they are pets'],ans:1},
+  {q:'What does the audio say about wild animals?',opts:['They are always friendly','They can be unpredictable and dangerous','They are easy to keep at home'],ans:1},
+  {q:'What do wild animals remind us to do?',opts:['Live in harmony with nature','Visit the zoo often','Eat more meat'],ans:0},
+];
+let listenAnswers={};
+function buildListenQuiz(){
+  listenAnswers={};
+  document.getElementById('listen-quiz').innerHTML=listenQuizData.map((q,i)=>
+    `<div class="quiz-item"><div class="quiz-q">${i+1}. ${q.q}</div>
+    <div class="quiz-opts">${q.opts.map((o,oi)=>
+      `<div class="quiz-opt" onclick="answerLQ(this,${i},${oi},${q.ans})">${String.fromCharCode(65+oi)}. ${o}</div>`
+    ).join('')}</div></div>`).join('');
+}
+function answerLQ(el,qi,oi,correct){
+  if(listenAnswers[qi]!==undefined) return;
+  listenAnswers[qi]=oi;
+  const opts=el.parentElement.querySelectorAll('.quiz-opt');
+  opts.forEach(o=>o.classList.add('disabled'));
+  if(oi===correct) el.classList.add('correct');
+  else{el.classList.add('incorrect');opts[correct].classList.add('correct');}
+  document.getElementById('listen-quiz-prog').style.width=(Object.keys(listenAnswers).length/listenQuizData.length*100)+'%';
+  if(Object.keys(listenAnswers).length===listenQuizData.length){
+    const ok=Object.entries(listenAnswers).filter(([i,v])=>v===listenQuizData[i].ans).length;
+    document.getElementById('listen-quiz-score').innerHTML=
+      `<div class="score-b">🏆 ${ok}/${listenQuizData.length}</div>
+       <button class="btn btn-ghost" style="margin-left:8px;" onclick="listenAnswers={};buildListenQuiz();document.getElementById('listen-quiz-score').innerHTML='';document.getElementById('listen-quiz-prog').style.width='0%'">🔄 Retry</button>`;
+  }
+}
+
+// ── CATEGORY SORT (Activities) ──
+const catData=[
+  {name:'horse',cat:'farm'},{name:'monkey',cat:'wild'},{name:'goat',cat:'farm'},
+  {name:'fly',cat:'insect'},{name:'bull',cat:'farm'},{name:'bee',cat:'insect'},
+  {name:'elephant',cat:'wild'},{name:'pig',cat:'farm'},{name:'mosquito',cat:'insect'},
+  {name:'tiger',cat:'wild'},{name:'donkey',cat:'farm'},{name:'camel',cat:'wild'},
+  {name:'ant',cat:'insect'},{name:'leopard',cat:'wild'},{name:'butterfly',cat:'insect'},
+];
+const catEmoji={horse:'🐴',monkey:'🐒',goat:'🐐',fly:'🪰',bull:'🐂',bee:'🐝',elephant:'🐘',pig:'🐷',mosquito:'🦟',tiger:'🐯',donkey:'🫏',camel:'🐫',ant:'🐜',leopard:'🐆',butterfly:'🦋'};
+let catSelected=null;
+function buildCatSort(){
+  catSelected=null;
+  document.getElementById('cat-result').innerHTML='';
+  const shuffled=[...catData].sort(()=>Math.random()-.5);
+  document.getElementById('cat-pool').innerHTML=shuffled.map(a=>
+    `<div class="pool-chip" id="cp-${a.name}" data-cat="${a.cat}" onclick="selectPoolChip(this)">${catEmoji[a.name]||''} ${a.name}</div>`
+  ).join('');
+  ['farm','wild','insect'].forEach(cat=>{document.getElementById('cat-'+cat).innerHTML='';});
+}
+function selectPoolChip(el){
+  document.querySelectorAll('.pool-chip').forEach(c=>c.style.border='2px solid var(--border)');
+  el.style.border='2px solid var(--green)';el.style.background='var(--green-l)';
+  catSelected=el;
+}
+function dropToCat(cat,e){
+  if(!catSelected) return;
+  const name=catSelected.dataset.name||catSelected.textContent.trim().replace(/^\S+\s/,'');
+  const realName=catSelected.id.replace('cp-','');
+  const chip=document.createElement('div');
+  chip.className='cat-chip';chip.textContent=catSelected.textContent;
+  chip.dataset.name=realName;chip.dataset.cat=catSelected.dataset.cat;
+  chip.onclick=()=>{
+    chip.remove();
+    const orig=document.getElementById('cp-'+realName);
+    if(orig){orig.classList.remove('placed');orig.style.border='2px solid var(--border)';orig.style.background='';}
+  };
+  document.getElementById('cat-'+cat).appendChild(chip);
+  catSelected.classList.add('placed');catSelected.style.border='';catSelected.style.background='';
+  catSelected=null;
+}
+function checkCatSort(){
+  let ok=0,total=0;
+  ['farm','wild','insect'].forEach(cat=>{
+    document.getElementById('cat-'+cat).querySelectorAll('.cat-chip').forEach(chip=>{
+      total++;
+      if(chip.dataset.cat===cat) ok++;
+      chip.style.outline=chip.dataset.cat===cat?'2px solid var(--green)':'2px solid var(--red)';
+    });
+  });
+  document.getElementById('cat-result').innerHTML=
+    `<div class="result-msg ${ok===total?'ok':'bad'}">${ok===total?'🎉 Hoàn toàn chính xác!':'📝 Cố lên!'} Đúng ${ok}/${total}</div>`;
+}
+
+// ── FILL ACT ──
+const fillActData=[
+  {s:'A ___ goes to sleep in winter.',ans:'tortoise'},
+  {s:'A ___ has a very long neck.',ans:'giraffe'},
+  {s:'___ swim and fly.',ans:'ducks'},
+  {s:'___ are farm birds.',ans:'chickens'},
+  {s:'Don\'t forget to ___ the cat and give it some water.',ans:'feed'},
+  {s:'You can ride a ___ and an ___.',ans:'horse'},
+  {s:'___ are very good at hopping and jumping.',ans:'rabbits'},
+  {s:'A dog lives in a ___.',ans:'kennel'},
+  {s:'A bird lives in a ___.',ans:'nest'},
+  {s:'A horse lives in a ___.',ans:'stable'},
+];
+function buildFillAct(){
+  document.getElementById('fill-act-qs').innerHTML=fillActData.map((item,i)=>{
+    const html=item.s.replace('___',`<input class="blank" data-ans="${item.ans}" placeholder="...">`);
+    return `<div class="fill-s">${i+1}. ${html}</div>`;
+  }).join('');
+}
+function checkFillAct(){
+  let ok=0,total=fillActData.length;
+  document.querySelectorAll('#fill-act-qs .blank').forEach(inp=>{
+    const v=inp.value.trim().toLowerCase(),a=inp.dataset.ans.toLowerCase();
+    inp.classList.toggle('ok',v===a);inp.classList.toggle('bad',v!==a);
+    if(v===a) ok++;
+  });
+  document.getElementById('fill-act-result').innerHTML=
+    `<div class="result-msg ${ok===total?'ok':'bad'}">${ok===total?'🎉 Hoàn hảo!':'⚠️'} Đúng ${ok}/${total}</div>`;
+}
+function resetFillAct(){
+  document.querySelectorAll('#fill-act-qs .blank').forEach(inp=>{inp.value='';inp.className='blank';});
+  document.getElementById('fill-act-result').innerHTML='';
+}
+
+// ── SORT ──
+const sortData=[
+  {words:['Elephants','are','very','big','and','strong','animals.'],answer:'Elephants are very big and strong animals.'},
+  {words:['The','dog','lives','in','a','kennel','in','the','garden.'],answer:'The dog lives in a kennel in the garden.'},
+  {words:['Do','you','have','any','pets','at','home?'],answer:'Do you have any pets at home?'},
+  {words:['Tigers','are','endangered','animals','in','the','wild.'],answer:'Tigers are endangered animals in the wild.'},
+  {words:['I','take','my','dog','for','a','walk','every','day.'],answer:'I take my dog for a walk every day.'},
+];
+function buildSort(){
+  document.getElementById('sort-qs').innerHTML=sortData.map((q,i)=>{
+    const sh=[...q.words].sort(()=>Math.random()-.5);
+    return `<div class="card" style="margin-bottom:12px;">
+      <div style="font-weight:700;margin-bottom:7px;color:var(--muted);font-size:12px;">Câu ${i+1}:</div>
+      <div class="word-bank" id="sb-${i}">${sh.map(w=>`<div class="wchip" onclick="placeW(this,${i},'${w.replace(/'/g,"\\'")}' )">${w}</div>`).join('')}</div>
+      <div class="sort-tgt" id="st-${i}" data-ans="${q.answer}"></div>
+      <div style="display:flex;gap:7px;margin-top:8px;">
+        <button class="btn btn-green" style="font-size:12px;padding:7px 14px;" onclick="checkSort(${i})">✅ Check</button>
+        <button class="btn btn-ghost" style="font-size:12px;padding:7px 14px;" onclick="resetSort(${i})">🔄 Reset</button>
+      </div>
+      <div id="sr-${i}" style="margin-top:7px;"></div>
+    </div>`;
+  }).join('');
+}
+function placeW(el,qi,w){
+  if(el.classList.contains('used')) return;
+  el.classList.add('used');
+  const chip=document.createElement('div');chip.className='placed';chip.textContent=w;
+  chip.onclick=()=>{chip.remove();el.classList.remove('used');};
+  document.getElementById('st-'+qi).appendChild(chip);
+}
+function checkSort(qi){
+  const tgt=document.getElementById('st-'+qi);
+  const placed=Array.from(tgt.querySelectorAll('.placed')).map(c=>c.textContent).join(' ');
+  const ok=placed.replace(/[?.]/g,'').toLowerCase()===tgt.dataset.ans.replace(/[?.]/g,'').toLowerCase();
+  document.getElementById('sr-'+qi).innerHTML=ok
+    ?`<div class="result-msg ok">🎉 Chính xác!</div>`
+    :`<div class="result-msg bad">❌ Đáp án: <em>${tgt.dataset.ans}</em></div>`;
+}
+function resetSort(qi){
+  document.getElementById('st-'+qi).innerHTML='';
+  document.getElementById('sr-'+qi).innerHTML='';
+  document.querySelectorAll(`#sb-${qi} .wchip`).forEach(c=>c.classList.remove('used'));
+}
+
+// ── QUIZ ──
+const quizData=[
+  {q:'A baby horse is called a ___.',opts:['calf','foal','piglet','chick'],ans:1},
+  {q:'Which animal gives us wool?',opts:['pig','cow','sheep','horse'],ans:2},
+  {q:'A bird lives in a ___.',opts:['kennel','hutch','stable','nest'],ans:3},
+  {q:'Which is NOT a farm animal?',opts:['cow','tiger','pig','sheep'],ans:1},
+  {q:'"Endangered" means ___.',opts:['dangerous','very common','at risk of dying out','living in the wild'],ans:2},
+  {q:'We get bacon from ___.',opts:['cow','sheep','chicken','pig'],ans:3},
+  {q:'Which is a sea creature?',opts:['butterfly','dolphin','ant','tortoise'],ans:1},
+  {q:'"Take the dog for a ___." (complete)',opts:['feed','walk','cage','nest'],ans:1},
+];
+let quizAnswers={};
+function buildQuiz(){
+  quizAnswers={};
+  document.getElementById('quiz-items').innerHTML=quizData.map((q,i)=>
+    `<div class="quiz-item"><div class="quiz-q">${i+1}. ${q.q}</div>
+    <div class="quiz-opts">${q.opts.map((o,oi)=>
+      `<div class="quiz-opt" onclick="answerQuiz(this,${i},${oi},${q.ans})">${String.fromCharCode(65+oi)}. ${o}</div>`
+    ).join('')}</div></div>`).join('');
+  document.getElementById('quiz-total').innerHTML='';
+  document.getElementById('quiz-prog').style.width='0%';
+}
+function answerQuiz(el,qi,oi,correct){
+  if(quizAnswers[qi]!==undefined) return;
+  quizAnswers[qi]=oi;
+  const opts=el.parentElement.querySelectorAll('.quiz-opt');
+  opts.forEach(o=>o.classList.add('disabled'));
+  if(oi===correct) el.classList.add('correct');
+  else{el.classList.add('incorrect');opts[correct].classList.add('correct');}
+  document.getElementById('quiz-prog').style.width=(Object.keys(quizAnswers).length/quizData.length*100)+'%';
+  if(Object.keys(quizAnswers).length===quizData.length){
+    const ok=Object.entries(quizAnswers).filter(([i,v])=>v===quizData[i].ans).length;
+    document.getElementById('quiz-total').innerHTML=
+      `<div class="score-b">🏆 Kết quả: ${ok}/${quizData.length}</div>
+       <button class="btn btn-ghost" style="margin-top:6px;" onclick="buildQuiz()">🔄 Chơi lại</button>`;
+  }
+}
+
+// ── HOMEWORK CAT ──
+const hwCatData=[
+  {name:'horse',cat:'farm'},{name:'monkey',cat:'wild'},{name:'goat',cat:'farm'},
+  {name:'fly',cat:'insect'},{name:'bull',cat:'farm'},{name:'bee',cat:'insect'},
+  {name:'elephant',cat:'wild'},{name:'pig',cat:'farm'},{name:'mosquito',cat:'insect'},
+  {name:'tiger',cat:'wild'},{name:'donkey',cat:'farm'},{name:'camel',cat:'wild'},
+  {name:'ant',cat:'insect'},{name:'leopard',cat:'wild'},{name:'butterfly',cat:'insect'},
+];
+let hwCatSelected=null;
+function buildHwCat(){
+  hwCatSelected=null;
+  document.getElementById('hw-cat-result').innerHTML='';
+  const shuffled=[...hwCatData].sort(()=>Math.random()-.5);
+  document.getElementById('hw-cat-pool').innerHTML=shuffled.map(a=>
+    `<div class="pool-chip" id="hwcp-${a.name}" data-cat="${a.cat}" onclick="selectHwChip(this)">${catEmoji[a.name]||''} ${a.name}</div>`
+  ).join('');
+  ['farm','wild','insect'].forEach(cat=>{document.getElementById('hw-cat-'+cat).innerHTML='';});
+}
+function selectHwChip(el){
+  document.querySelectorAll('#hw-cat-pool .pool-chip').forEach(c=>c.style.border='2px solid var(--border)');
+  el.style.border='2px solid var(--green)';el.style.background='var(--green-l)';
+  hwCatSelected=el;
+}
+function hwDropToCat(cat,e){
+  if(!hwCatSelected) return;
+  const realName=hwCatSelected.id.replace('hwcp-','');
+  const chip=document.createElement('div');
+  chip.className='cat-chip';chip.textContent=hwCatSelected.textContent;
+  chip.dataset.name=realName;chip.dataset.cat=hwCatSelected.dataset.cat;
+  chip.onclick=()=>{
+    chip.remove();
+    const orig=document.getElementById('hwcp-'+realName);
+    if(orig){orig.classList.remove('placed');orig.style.border='2px solid var(--border)';orig.style.background='';}
+  };
+  document.getElementById('hw-cat-'+cat).appendChild(chip);
+  hwCatSelected.classList.add('placed');hwCatSelected.style.border='';hwCatSelected.style.background='';
+  hwCatSelected=null;
+}
+function checkHwCat(){
+  let ok=0,total=0;
+  ['farm','wild','insect'].forEach(cat=>{
+    document.getElementById('hw-cat-'+cat).querySelectorAll('.cat-chip').forEach(chip=>{
+      total++;
+      if(chip.dataset.cat===cat) ok++;
+      chip.style.outline=chip.dataset.cat===cat?'2px solid var(--green)':'2px solid var(--red)';
+    });
+  });
+  document.getElementById('hw-cat-result').innerHTML=
+    `<div class="result-msg ${ok===total?'ok':'bad'}">${ok===total?'🎉 Hoàn toàn chính xác!':'📝 Cố lên!'} Đúng ${ok}/${total}</div>`;
+}
+
+// ── HOMEWORK 2 ──
+const hw2Data=[
+  {s:'A ___ goes to sleep in winter.',ans:'tortoise'},
+  {s:'A ___ has a very long neck.',ans:'giraffe'},
+  {s:'___ are farm birds.',ans:'chickens'},
+  {s:'Don\'t forget to ___ the cat and give it some water.',ans:'feed'},
+  {s:'A dog lives in a ___.',ans:'kennel'},
+  {s:'A horse lives in a ___.',ans:'stable'},
+  {s:'A bird builds a ___.',ans:'nest'},
+  {s:'A rabbit lives in a ___.',ans:'hutch'},
+];
+function buildHw2(){
+  document.getElementById('hw2-qs').innerHTML=hw2Data.map((item,i)=>{
+    const html=item.s.replace('___',`<input class="blank" data-ans="${item.ans}" placeholder="...">`);
+    return `<div class="fill-s" style="font-size:14px;">${i+1}. ${html}</div>`;
+  }).join('');
+}
+function checkHw2(){
+  let ok=0,total=hw2Data.length;
+  document.querySelectorAll('#hw2-qs .blank').forEach(inp=>{
+    const v=inp.value.trim().toLowerCase(),a=inp.dataset.ans.toLowerCase();
+    inp.classList.toggle('ok',v===a);inp.classList.toggle('bad',v!==a);
+    if(v===a) ok++;
+  });
+  document.getElementById('hw2-result').innerHTML=
+    `<div class="result-msg ${ok===total?'ok':'bad'}">${ok===total?'🎉 Tuyệt vời!':'📝 Cố lên!'} Đúng ${ok}/${total}</div>`;
+}
+function resetHw2(){
+  document.querySelectorAll('#hw2-qs .blank').forEach(inp=>{inp.value='';inp.className='blank';});
+  document.getElementById('hw2-result').innerHTML='';
+}
+
+// ── HOMEWORK 3: MEAT-BABY TABLE ──
+const hw3Data=[
+  {animal:'🐐 goat',meat:'goat',baby:'kid'},
+  {animal:'🐑 sheep',meat:'lamb',baby:'lamb'},
+  {animal:'🐄 cow',meat:'beef',baby:'calf'},
+  {animal:'🐔 hen',meat:'chicken',baby:'chick'},
+  {animal:'🐷 pig',meat:'pork',baby:'piglet'},
+];
+function buildHw3(){
+  document.getElementById('hw3-body').innerHTML=hw3Data.map(r=>
+    `<tr>
+      <td><strong>${r.animal}</strong></td>
+      <td class="hw3-meat" style="color:var(--muted);filter:blur(5px);transition:filter .3s;">${r.meat}</td>
+      <td class="hw3-baby" style="color:var(--muted);filter:blur(5px);transition:filter .3s;">${r.baby}</td>
+    </tr>`).join('');
+}
+function toggleHw3(){
+  const showMeat=document.getElementById('hw3-m-check').checked;
+  const showBaby=document.getElementById('hw3-b-check').checked;
+  document.querySelectorAll('.hw3-meat').forEach(td=>td.style.filter=showMeat?'none':'blur(5px)');
+  document.querySelectorAll('.hw3-baby').forEach(td=>td.style.filter=showBaby?'none':'blur(5px)');
+}
+
+// ── WORD COUNT ──
+function countWords(areaId,countId){
+  const t=document.getElementById(areaId).value.trim();
+  const c=t?t.split(/\s+/).length:0;
+  document.getElementById(countId).textContent=c;
+}
+
+// ── INIT ──
+buildSoundQuiz();
+buildVfc();
+buildVtable(vocabData);
+initHomeMatch();
+buildListenQuiz();
+buildCatSort();
+buildFillAct();
+buildSort();
+buildQuiz();
+buildHwCat();
+buildHw2();
+buildHw3();
+</script>
+</body>
+</html>
+JSEOF
+echo "JS done"
